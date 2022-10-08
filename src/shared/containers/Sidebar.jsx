@@ -1,15 +1,61 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import {useAuthState} from "react-firebase-hooks/auth";
-import {auth} from "config/firebase";
+import {auth, db} from "config/firebase";
 import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
 import IconButton from '@mui/material/IconButton';
 import SidebarOption from "shared/containers/SidebarOption";
 import MessageIcon from '@mui/icons-material/Message';
+import {collection, getDocs, query, onSnapshot} from "firebase/firestore";
+import {DATABASE_NAME} from "config/firestore.constant";
 
 const Sidebar = () => {
   const [user] = useAuthState(auth);
+  const [channels, setChannels] = useState([])
+
+  const getListOfChannel = async () => {
+    const channelListResp = await getDocs(collection(db, DATABASE_NAME.CHANNELS));
+    let arr = [];
+    channelListResp.forEach((doc) => {
+      arr.push({
+        id: doc.id,
+        name: doc.data().name
+      })
+    });
+    setChannels(arr);
+  }
+
+  useEffect(() => {
+    const q = query(collection(db, DATABASE_NAME.CHANNELS));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      let arr = [...channels];
+      snapshot.docs.forEach(doc => {
+        arr.push({
+          id: doc.id,
+          name: doc.data().name
+        })
+      })
+
+      // snapshot.docChanges().forEach((change) => {
+      //   console.log('log::34 useEffect: ', change.doc.data())
+      //   arr.push({
+      //     id: change.doc.id,
+      //     name: change.doc.data().name
+      //   })
+      // });
+
+      setChannels(arr);
+
+    });
+
+    return () => unsubscribe()
+  }, [])
+
+  console.log('log::31 Sidebar', channels)
+
+
 
   return (
     <SidebarContainer>
@@ -34,6 +80,23 @@ const Sidebar = () => {
       <SidebarOption Icon={MessageIcon} title={"Apps"} />
       <SidebarOption Icon={MessageIcon} title={"file browser"} />
       <SidebarOption Icon={MessageIcon} title={"Show less"} />
+
+      <hr/>
+
+      <SidebarOption Icon={MessageIcon} title={"Channels"} />
+
+      {channels.map(channel => {
+        return (
+          <SidebarOption key={channel.id} Icon={MessageIcon} title={channel.name} type={"channel"}/>
+        )
+      })}
+
+      <SidebarOption Icon={AddIcon} title={"Add Channel"} addChannelOption />
+
+
+
+
+      <hr/>
 
     </SidebarContainer>
   );

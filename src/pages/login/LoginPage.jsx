@@ -36,7 +36,7 @@ const LoginPage = (props) => {
   return (
     <LoginContainer>
       <LoginInnerContainer>
-        <img src={SlackLogo} alt="SLack Logo"/>
+        <img src={SlackLogo} alt="Slack Logo"/>
         <h1>Sign in</h1>
         {/*refs: https://mui.com/material-ui/react-button/*/}
         <Button onClick={onSignInWithGGAccount}>Sign in with google</Button>
