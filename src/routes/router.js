@@ -1,23 +1,23 @@
-import React from "react";
-import {BrowserRouter, Route, Switch} from "react-router-dom";
+import React, {Suspense} from "react";
+import {Route, Routes} from "react-router-dom";
 import {RouteItems} from "routes/router-options";
 
-const SlackPublicRoutes = (props) => {
+// refs: https://reactrouter.com/en/v6.3.0/getting-started/overview
+const SlackPublicRoutes = () => {
   return (
-    <BrowserRouter>
-      <Switch>
+    <Suspense fallback={null}>
+      <Routes>
         {RouteItems.map(Item => {
           return (
             <Route
               key={`${Item.path}_${Item.id}`}
-              exact={Item.exact}
               path={Item.path}
-              component={Item.component}
+              element={<Item.Component/>}
             />
-          )
+          );
         })}
-      </Switch>
-    </BrowserRouter>
+      </Routes>
+    </Suspense>
   );
 };
 

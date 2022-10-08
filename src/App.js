@@ -1,10 +1,13 @@
 import React from "react";
-import './App.css';
+import "./App.css";
 import SlackPublicRoutes from "routes/router";
+import {BrowserRouter} from "react-router-dom";
 
 function App() {
   return (
-   <SlackPublicRoutes/>
+    <BrowserRouter>
+      <SlackPublicRoutes/>
+    </BrowserRouter>
   );
 }
 
