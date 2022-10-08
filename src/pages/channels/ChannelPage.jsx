@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 
 const ChannelPage = props => {
   return (
@@ -9,8 +8,5 @@ const ChannelPage = props => {
   );
 };
 
-ChannelPage.propTypes = {
-
-};
 
 export default ChannelPage;
