@@ -4,13 +4,14 @@ import MessageIcon from "@mui/icons-material/Message";
 import {Button} from "@mui/material";
 import Message from "shared/containers/Message";
 import ChatInput from "shared/containers/ChatInput";
-import {doc, getDoc} from "firebase/firestore";
+import {collection, doc, getDoc, onSnapshot, query, orderBy} from "firebase/firestore";
 import {db} from "config/firebase";
 import {DATABASE_NAME} from "config/firestore.constant";
 
 const ChannelPage = (props) => {
   const {channelId} = props;
   const [channelData, setChannelData] = useState(null);
+  const [messages, setMessages] = useState([]);
 
   const getDetailChannelById = async (cId) => {
     const docRef = doc(db, DATABASE_NAME.CHANNELS, cId);
@@ -20,10 +21,28 @@ const ChannelPage = (props) => {
   };
 
   useEffect(() => {
-    if (channelId) {
-      getDetailChannelById(channelId);
-    }
+    if (channelId) getDetailChannelById(channelId);
+  }, [channelId]);
 
+
+  useEffect(() => {
+    const q = query(
+      collection(db, DATABASE_NAME.CHANNELS, channelId, DATABASE_NAME.MESSAGE),
+      orderBy("timeStamp", "asc") // asc | desc
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      let arr = [];
+      snapshot.docs.forEach((doc) => {
+        arr.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+
+      setMessages(arr);
+    });
+
+    return () => unsubscribe();
   }, [channelId]);
 
   const onDeleteChannel = () => {
@@ -45,10 +64,19 @@ const ChannelPage = (props) => {
       </Header>
 
       <ChatMessage>
-        <Message/>
+        {messages.map(message => {
+          return (
+            <Message
+              key={message.id}
+              message={message.message}
+              userName={message.userName}
+              userImage={message.userImage}
+              timestamp={message.timeStamp}/>
+          );
+        })}
       </ChatMessage>
 
-      <ChatInput/>
+      <ChatInput channelId={channelId} channel={channelData}/>
     </ChannelContainer>
   );
 };

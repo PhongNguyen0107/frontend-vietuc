@@ -1,3 +1,4 @@
 export const DATABASE_NAME = {
-  CHANNELS: "channels"
+  CHANNELS: "channels",
+  MESSAGE: "messages"
 }
