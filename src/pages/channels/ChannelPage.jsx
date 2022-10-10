@@ -4,14 +4,19 @@ import MessageIcon from "@mui/icons-material/Message";
 import {Button} from "@mui/material";
 import Message from "shared/containers/Message";
 import ChatInput from "shared/containers/ChatInput";
-import {collection, doc, getDoc, onSnapshot, query, orderBy} from "firebase/firestore";
-import {db} from "config/firebase";
+import {collection, doc, getDoc, onSnapshot, query, orderBy, deleteDoc} from "firebase/firestore";
+import {auth, db} from "config/firebase";
 import {DATABASE_NAME} from "config/firestore.constant";
+import {useDispatch} from "react-redux";
+import {enterChannel} from "redux/channel/channel";
+import {useAuthState} from "react-firebase-hooks/auth";
 
 const ChannelPage = (props) => {
+  const dispatch = useDispatch()
   const {channelId} = props;
   const [channelData, setChannelData] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [user] = useAuthState(auth)
 
   const getDetailChannelById = async (cId) => {
     const docRef = doc(db, DATABASE_NAME.CHANNELS, cId);
@@ -45,8 +50,12 @@ const ChannelPage = (props) => {
     return () => unsubscribe();
   }, [channelId]);
 
-  const onDeleteChannel = () => {
-    console.log("log::8 onDeleteChannel");
+  const onDeleteChannel = async () => {
+    if(!channelId && !channelData) return;
+    if(user.email !== channelData.created_by) return alert("Bạn không được phép xóa kênh mà không phải do bạn tạo nha!")
+
+    await deleteDoc(doc(db, DATABASE_NAME.CHANNELS, channelId));
+    dispatch(enterChannel({channelId: null}))
   };
 
   if (!channelData) return <React.Fragment/>;
