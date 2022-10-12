@@ -12,7 +12,7 @@ const HomePage = () => {
   // const [user] = useAuthState(auth);
 
   const channelActiveId = useSelector(selectedChannelId)
-  console.log('log::15 HomePage channelActiveId', channelActiveId)
+
   return (
     <React.Fragment>
       <Header />

@@ -3,6 +3,11 @@ import {ROUTE_NAME} from "routes/router.constant";
 
 export const RouteItems = [
   {
+    id: 0,
+    path: ROUTE_NAME.ROOT,
+    Component: React.lazy(() => import("pages/login/LoginPage"))
+  },
+  {
     id: 1,
     path: ROUTE_NAME.SIGN_IN,
     Component: React.lazy(() => import("pages/login/LoginPage"))

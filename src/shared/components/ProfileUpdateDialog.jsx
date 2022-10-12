@@ -25,6 +25,10 @@ export default function ProfileUpdateDialog(props) {
   const [open, setOpen] = React.useState(false);
 
   const {control, handleSubmit, formState: {errors}} = useForm({
+    defaultValues: {
+      displayName: user.displayName,
+      photoURL: user.photoURL
+    },
     resolver: yupResolver(profileGGSchema)
   });
 

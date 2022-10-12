@@ -6,14 +6,22 @@ import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import {useAuthState} from "react-firebase-hooks/auth";
 import {auth} from "config/firebase";
 import {Avatar} from "@mui/material";
+import {useNavigate} from "react-router-dom";
+import {ROUTE_NAME} from "routes/router.constant";
+import {onSignOutUser} from "services/UserProfileService";
+
 
 const Header = () => {
   const [user] = useAuthState(auth);
+  const navigate = useNavigate()
+
+  const onSignOut = () => onSignOutUser(user, () => navigate(ROUTE_NAME.SIGN_IN))
 
   return (
     <HeaderContainer>
       <HeaderLeft>
         <HeaderAvatar
+          onClick={onSignOut}
           alt={user?.displayName}
           src={user?.photoURL}
         />

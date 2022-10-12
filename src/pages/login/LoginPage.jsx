@@ -7,6 +7,7 @@ import {GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import {useNavigate} from "react-router-dom";
 import {ROUTE_NAME} from "routes/router.constant";
 import {useAuthState} from "react-firebase-hooks/auth";
+import {saveUserInfo} from "services/UserProfileService";
 
 
 const LoginPage = () => {
@@ -24,7 +25,10 @@ const LoginPage = () => {
         // The signed-in user info.
         const user = result.user;
         console.log("log::19 signInWithPopup user", user, token);
-        if (user && token) navigate(ROUTE_NAME.HOME);
+        if (user && token) {
+          saveUserInfo(user)
+          navigate(ROUTE_NAME.HOME);
+        }
       }).catch((error) => {
       // Handle Errors here.
       console.log("log::22 signInWithPopup: error case: ", error);
