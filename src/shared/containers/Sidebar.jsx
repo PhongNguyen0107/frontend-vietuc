@@ -3,17 +3,32 @@ import styled from "styled-components";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import {useAuthState} from "react-firebase-hooks/auth";
 import {auth, db} from "config/firebase";
-import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import IconButton from "@mui/material/IconButton";
 import SidebarOption from "shared/containers/SidebarOption";
 import MessageIcon from "@mui/icons-material/Message";
 import {collection, query, onSnapshot} from "firebase/firestore";
 import {DATABASE_NAME} from "config/firestore.constant";
+import ProfileUpdateDialog from "shared/components/ProfileUpdateDialog";
+// import {onAuthStateChanged} from 'firebase/auth'
 
 const Sidebar = () => {
   const [user] = useAuthState(auth);
+  const [userData, setUserData] = useState(null)
   const [channels, setChannels] = useState([]);
+
+  const getUserDetail = () => {
+    const userNew = auth.currentUser;
+    setUserData({...userNew})
+
+    // onAuthStateChanged(auth, (user) => {
+    //   console.log('log::24 Anonymous', user.displayName)
+    //   setUserData({...user})
+    // })
+  }
+
+  useEffect(() => {
+    setUserData(user)
+  }, [user])
 
   useEffect(() => {
     const q = query(collection(db, DATABASE_NAME.CHANNELS));
@@ -33,21 +48,18 @@ const Sidebar = () => {
     return () => unsubscribe();
   }, []);
 
-
   return (
     <SidebarContainer>
       <SidebarHeader>
         <SidebarInfo>
           <h2>Trung Tam Viet Uc Frontend</h2>
-          <h3>
+          <h3 key={userData?.displayName}>
             <FiberManualRecordIcon color={"success"}/>
-            {user?.displayName}
+            {userData?.displayName}
           </h3>
+          <ProfileUpdateDialog getUserDetail={getUserDetail} />
         </SidebarInfo>
-        {/*refs: https://mui.com/material-ui/api/icon/*/}
-        <IconButton sx={{color: "#fff"}} aria-label="delete" size="small">
-          <EditIcon fontSize="inherit"/>
-        </IconButton>
+
       </SidebarHeader>
 
       <SidebarOption Icon={MessageIcon} title={"Threads"}/>

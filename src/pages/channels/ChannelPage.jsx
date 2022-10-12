@@ -4,7 +4,7 @@ import MessageIcon from "@mui/icons-material/Message";
 import {Button} from "@mui/material";
 import Message from "shared/containers/Message";
 import ChatInput from "shared/containers/ChatInput";
-import {collection, doc, getDoc, onSnapshot, query, orderBy, deleteDoc} from "firebase/firestore";
+import {collection, doc, getDoc, onSnapshot, query, orderBy, deleteDoc, updateDoc} from "firebase/firestore";
 import {auth, db} from "config/firebase";
 import {DATABASE_NAME} from "config/firestore.constant";
 import {useDispatch} from "react-redux";
@@ -58,12 +58,33 @@ const ChannelPage = (props) => {
     dispatch(enterChannel({channelId: null}))
   };
 
+  const onHandleUpdateChannelName = async () => {
+    const channelName = prompt("Bạn hãy nhập tên channel bạn muốn cập nhật: ");
+    if(!channelName) return;
+
+    updateDoc(doc(db, DATABASE_NAME.CHANNELS, channelId), {
+      name: channelName
+    }).then(() => {
+      // set state trực tiếp => cập nhật lại UI
+      setChannelData({
+        ...channelName,
+        name: channelName
+      })
+
+      // gọi lại hàm getDetailChannelById
+      // getDetailChannelById(channelId)
+    }).catch(err => {
+      console.log('log::75 cập nhật channel bị lỗi', err)
+    })
+
+  }
+
   if (!channelData) return <React.Fragment/>;
   return (
     <ChannelContainer>
       <Header>
         <HeaderLeft>
-          <h4>#{channelData.name}</h4>
+          <h4 onClick={onHandleUpdateChannelName} >#{channelData.name}</h4>
           <MessageIcon fontSize={"small"} style={{padding: 12}}/>
         </HeaderLeft>
         <HeaderRight>
