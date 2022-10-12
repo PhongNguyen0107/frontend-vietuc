@@ -6,10 +6,11 @@ import {DATABASE_NAME} from "config/firestore.constant";
 import {useDispatch} from "react-redux";
 import {enterChannel} from "redux/channel/channel";
 import {useAuthState} from "react-firebase-hooks/auth";
+import {Avatar} from "@mui/material";
 
 // refs: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND
 const SidebarOption = (props) => {
-  const {Icon, title, type, addChannelOption, channel} = props;
+  const {Icon, title, type, addChannelOption, channel, userData} = props;
   const dispatch = useDispatch();
   const [user] = useAuthState(auth)
 
@@ -17,6 +18,10 @@ const SidebarOption = (props) => {
   const onEnterChannel = () => {
     console.log("log::17 onClickMenuItem enter Channel id: ", channel.id);
     dispatch(enterChannel({channelId: channel.id}));
+  };
+
+  const onDirectMessageWithUser = () => {
+    console.log('log::24 onDirectMessageWithUser', )
   };
 
   const onClickMenuItem = () => {
@@ -43,19 +48,38 @@ const SidebarOption = (props) => {
 
   };
 
-  if (type === "channel") {
-    return (
-      <SidebarOptionContainer onClick={onEnterChannel}>
-        <h3>#{title}</h3>
-      </SidebarOptionContainer>
-    );
+  const getSidebarUIByType=(uiType) => {
+    switch (uiType) {
+      case "channel":
+        return (
+          <SidebarOptionContainer onClick={onEnterChannel}>
+            <h3>#{title}</h3>
+          </SidebarOptionContainer>
+        )
+
+      case "user":
+        return (
+          <SidebarOptionContainer onClick={onDirectMessageWithUser}>
+            <Avatar alt={userData.displayName} src={userData.photoURL} />
+            <h3>{userData.displayName}</h3>
+          </SidebarOptionContainer>
+        )
+
+      default:
+        return (
+          <SidebarOptionContainer onClick={onClickMenuItem}>
+            {Icon && <Icon fontSize={"small"} style={{padding: 12}}/>}
+            <h3>{title}</h3>
+          </SidebarOptionContainer>
+        )
+    }
   }
 
+
   return (
-    <SidebarOptionContainer onClick={onClickMenuItem}>
-      {Icon && <Icon fontSize={"small"} style={{padding: 12}}/>}
-      <h3>{title}</h3>
-    </SidebarOptionContainer>
+    <React.Fragment>
+      {getSidebarUIByType(type)}
+    </React.Fragment>
   );
 };
 

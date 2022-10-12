@@ -6,7 +6,7 @@ import {auth, db} from "config/firebase";
 import AddIcon from "@mui/icons-material/Add";
 import SidebarOption from "shared/containers/SidebarOption";
 import MessageIcon from "@mui/icons-material/Message";
-import {collection, query, onSnapshot} from "firebase/firestore";
+import {collection, query, onSnapshot, where} from "firebase/firestore";
 import {DATABASE_NAME} from "config/firestore.constant";
 import ProfileUpdateDialog from "shared/components/ProfileUpdateDialog";
 // import {onAuthStateChanged} from 'firebase/auth'
@@ -15,6 +15,7 @@ const Sidebar = () => {
   const [user] = useAuthState(auth);
   const [userData, setUserData] = useState(null)
   const [channels, setChannels] = useState([]);
+  const [users, setUsers] = useState([]);
 
   const getUserDetail = () => {
     const userNew = auth.currentUser;
@@ -42,6 +43,24 @@ const Sidebar = () => {
       });
 
       setChannels(arr);
+
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const q = query(collection(db, DATABASE_NAME.USERS), where("active", "==", true));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      let arr = [];
+      snapshot.forEach(doc => {
+        arr.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+
+      setUsers(arr);
 
     });
 
@@ -84,6 +103,14 @@ const Sidebar = () => {
 
 
       <hr/>
+      <SidebarOption Icon={MessageIcon} title={"Direct Message"}/>
+      {users.map(userActive => {
+        return (
+          <SidebarOption userData={userActive} key={userActive.uid}  type={"user"}/>
+        );
+      })}
+
+
 
     </SidebarContainer>
   );

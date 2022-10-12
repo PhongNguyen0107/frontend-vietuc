@@ -16,5 +16,10 @@ export const RouteItems = [
     id: 2,
     path: ROUTE_NAME.HOME,
     Component: React.lazy(() => import("pages/home/HomePage"))
+  },
+  {
+    id: 3,
+    path: "*",
+    Component: React.lazy(() => import("pages/NotFoundPage"))
   }
 ];
